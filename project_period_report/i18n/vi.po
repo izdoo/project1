@@ -1,0 +1,65 @@
+# Translation of Odoo Server.
+# vi_VN
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#. module: project_period_report
+msgid "Week"
+msgstr "Tuần"
+
+#. module: project_period_report
+msgid "Month"
+msgstr "Tháng"
+
+#. module: project_period_report
+msgid "New Period Report"
+msgstr "Báo cáo kỳ mới"
+
+#. module: project_period_report
+msgid "Period Reports"
+msgstr "Báo cáo theo kỳ"
+
+#. module: project_period_report
+msgid "Weekly / Monthly Project Report"
+msgstr "Báo cáo dự án (tuần / tháng)"
+
+#. module: project_period_report
+msgid "1. Basic information"
+msgstr "1. Thông tin cơ bản"
+
+#. module: project_period_report
+msgid "2. Achievements (this period)"
+msgstr "2. Kết quả (kỳ này)"
+
+#. module: project_period_report
+msgid "3. Next period plan"
+msgstr "3. Kế hoạch kỳ tới"
+
+#. module: project_period_report
+msgid "4. Overall progress"
+msgstr "4. Tiến độ tổng thể"
+
+#. module: project_period_report
+msgid "5. Issues / problems"
+msgstr "5. Vấn đề / sự cố"
+
+#. module: project_period_report
+msgid "6. Risks"
+msgstr "6. Rủi ro"
+
+#. module: project_period_report
+msgid "7. Others"
+msgstr "7. Khác"
+
+#. module: project_period_report
+msgid "On track"
+msgstr "Đúng tiến độ"
+
+#. module: project_period_report
+msgid "Delay"
+msgstr "Trễ"
+
+#. module: project_period_report
+msgid "Risk"
+msgstr "Rủi ro"

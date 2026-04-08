@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_project_period_report_tree" model="ir.ui.view">
+        <field name="name">project.period.report.list</field>
+        <field name="model">project.period.report</field>
+        <field name="arch" type="xml">
+            <list string="Period Reports">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="period_type"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="reporter_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_project_period_report_form" model="ir.ui.view">
+        <field name="name">project.period.report.form</field>
+        <field name="model">project.period.report</field>
+        <field name="arch" type="xml">
+            <form string="Period Report">
+                <header>
+                    <button name="action_load_tasks_from_period" type="object" string="Load completed tasks" class="btn-secondary"/>
+                    <button name="action_print_pdf" type="object" string="Print PDF" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="project_id" options="{'no_create': True}"/>
+                            <field name="period_type"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="reporter_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Kết quả tuần này" name="achievements">
+                            <group string="KPI">
+                                <group>
+                                    <field name="weekly_completion_percent"/>
+                                    <field name="weekly_bug_count"/>
+                                </group>
+                                <group>
+                                    <field name="weekly_task_count"/>
+                                    <field name="weekly_man_day"/>
+                                </group>
+                            </group>
+                            <separator string="Task hoàn thành"/>
+                            <field name="achievement_completed_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="task_id" optional="show"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                            <separator string="Task đang thực hiện"/>
+                            <field name="achievement_in_progress_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="task_id" optional="show"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                            <separator string="Task bị chen thêm"/>
+                            <field name="achievement_injected_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="task_id" optional="show"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Next period plan" name="plan_next">
+                            <button name="action_load_next_period_plan" type="object" string="Load next period plan" class="btn-secondary mb-2"/>
+                            <field name="plan_next_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="source_type" optional="show"/>
+                                    <field name="task_id" optional="show"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Progress by area" name="progress">
+                            <field name="progress_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="plan_percent"/>
+                                    <field name="actual_percent"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Issues" name="issues">
+                            <field name="issue_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="problem"/>
+                                    <field name="cause"/>
+                                    <field name="impact"/>
+                                    <field name="action_note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Risks" name="risks">
+                            <field name="risk_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Others" name="others">
+                            <field name="other_notes" widget="html"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_project_period_report_search" model="ir.ui.view">
+        <field name="name">project.period.report.search</field>
+        <field name="model">project.period.report</field>
+        <field name="arch" type="xml">
+            <search string="Period Reports">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="reporter_id"/>
+                <filter name="filter_week" string="Week" domain="[('period_type', '=', 'week')]"/>
+                <filter name="filter_month" string="Month" domain="[('period_type', '=', 'month')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_project" string="Project" context="{'group_by': 'project_id'}"/>
+                    <filter name="group_period" string="Period type" context="{'group_by': 'period_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_project_period_report" model="ir.actions.act_window">
+        <field name="name">Period Reports</field>
+        <field name="res_model">project.period.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_project_period_report_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a weekly or monthly report for a project.
+            </p>
+        </field>
+    </record>
+</odoo>

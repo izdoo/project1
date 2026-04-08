@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="menu_project_period_report_root"
+        name="Period Reports"
+        parent="project.menu_project_report"
+        action="action_project_period_report"
+        sequence="45"
+    />
+</odoo>
