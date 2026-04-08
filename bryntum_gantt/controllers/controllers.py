@@ -394,14 +394,27 @@ class BryntumGantt(http.Controller):
                         task.assigned_resources.unlink()
                         for assignment in task_assignments:
                             resource_id = get_resource_id(assignment.get('resource_id'))
-                            t = task_assignments_env.create({
+                            task_assignments_env.create({
                                 'task': to_task_id(assignment.get('task_id')),
                                 'resource': resource_id[0],
                                 'resource_base': resource_id[1],
                                 'units': int(assignment.get('units'))
                             })
-                        task.employee_ids = request.env['project.task.assignment'].search(
-                                [('task', '=', task.id)]).resource_base.employee_id or False
+                        rows = request.env['project.task.assignment'].search([('task', '=', task.id)])
+                        employees = rows.mapped('resource_base.employee_id')
+                        if not employees:
+                            # fallback: assignment resource can be user-based
+                            if 'employee_id' in request.env['res.users']._fields:
+                                employees = rows.mapped('resource.employee_id')
+                            elif 'employee_ids' in request.env['res.users']._fields:
+                                employees = rows.mapped('resource.employee_ids')
+                        users = employees.mapped('user_id')
+                        sync_vals = {'employee_ids': [(6, 0, employees.ids)]}
+                        if 'assigned_ids' in task._fields:
+                            sync_vals['assigned_ids'] = [(6, 0, users.ids)]
+                        if 'user_ids' in task._fields:
+                            sync_vals['user_ids'] = [(6, 0, users.ids)]
+                        task.with_context(skip_bryntum_assignment_sync=True).write(sync_vals)
 
                     baselines = new_data.get('baselines')
 

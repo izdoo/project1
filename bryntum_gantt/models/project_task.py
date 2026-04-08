@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+import logging
 from odoo import models, fields, api
 from odoo.tools.misc import format_date
 import dateutil.parser
 from ..tools.odoo_utils import is_enterprise
+
+_logger = logging.getLogger(__name__)
 
 if not is_enterprise():
     class Task(models.Model):
@@ -88,36 +91,148 @@ class ProjectTask(models.Model):
     bryntum_rollup = fields.Boolean(string="Rollup", default=False)
     wbs_value = fields.Char(string="WBS Value")
 
+    def _users_to_employees(self, users):
+        if not users:
+            return self.env["hr.employee"]
+        if "employee_id" in users._fields:
+            return users.mapped("employee_id")
+        if "employee_ids" in users._fields:
+            return users.mapped("employee_ids")
+        return self.env["hr.employee"]
+
+    def _sync_gantt_assignments_from_employees(self):
+        """Keep Bryntum assignment rows + user fields aligned with employee_ids."""
+        for task in self:
+            employees = task.employee_ids
+            users = employees.mapped("user_id")
+
+            task.assigned_resources.unlink()
+            for employee in employees:
+                self.env["project.task.assignment"].create(
+                    {
+                        "task": task.id,
+                        "resource": employee.user_id.id or False,
+                        "resource_base": employee.resource_id.id or False,
+                        "units": int(100),
+                    }
+                )
+
+            sync_vals = {}
+            if "assigned_ids" in task._fields:
+                sync_vals["assigned_ids"] = [(6, 0, users.ids)]
+            if "user_ids" in task._fields:
+                sync_vals["user_ids"] = [(6, 0, users.ids)]
+            if sync_vals:
+                task.with_context(skip_bryntum_assignment_sync=True).write(sync_vals)
+
+    @api.onchange('planned_date_begin')
+    def _onchange_planned_date_begin_keep_range_valid(self):
+        """Prevent losing start date in UI when start > end by normalizing range."""
+        for task in self:
+            _logger.info(
+                "Bryntum onchange planned_date_begin task_id=%s incoming=(%s, %s)",
+                task.id or "new",
+                task.planned_date_begin,
+                task.planned_date_end,
+            )
+            if (
+                task.planned_date_begin
+                and task.planned_date_end
+                and task.planned_date_begin > task.planned_date_end
+            ):
+                task.planned_date_end = task.planned_date_begin
+                _logger.info(
+                    "Bryntum onchange normalized end to start task_id=%s normalized=(%s, %s)",
+                    task.id or "new",
+                    task.planned_date_begin,
+                    task.planned_date_end,
+                )
+
     def write(self, vals):
         """
                 override this function to pass resource to the gantt chart
         """
+        if 'planned_date_begin' in vals or 'planned_date_end' in vals:
+            _logger.info(
+                "Bryntum task.write incoming task_ids=%s vals_planned=%s",
+                self.ids,
+                {k: vals.get(k) for k in ('planned_date_begin', 'planned_date_end') if k in vals},
+            )
+        if self.env.context.get("skip_bryntum_assignment_sync"):
+            return super(ProjectTask, self).write(vals)
+        if len(self) == 1:
+            current = self
+            new_start = vals.get('planned_date_begin')
+            new_end = vals.get('planned_date_end')
+
+            if new_start and new_end:
+                if check_gantt_date(new_start) > check_gantt_date(new_end):
+                    vals['planned_date_end'] = new_start
+            elif new_start and current.planned_date_end:
+                # Bryntum often sends only the changed field (startDate OR endDate).
+                # Keep date range valid to avoid rollback/reset in UI.
+                if check_gantt_date(new_start) > check_gantt_date(current.planned_date_end):
+                    vals['planned_date_end'] = new_start
+            elif new_end and current.planned_date_begin:
+                if check_gantt_date(current.planned_date_begin) > check_gantt_date(new_end):
+                    vals['planned_date_begin'] = new_end
+
+            # Some databases have a constraint: planned_date_begin <= date_deadline.
+            # Keep deadline aligned with planning dates to avoid rollback on save.
+            candidate_start = vals.get('planned_date_begin') or current.planned_date_begin
+            candidate_end = vals.get('planned_date_end') or current.planned_date_end
+            candidate_deadline = vals.get('date_deadline') or current.date_deadline
+            if candidate_start and candidate_deadline and check_gantt_date(candidate_start) > check_gantt_date(candidate_deadline):
+                vals['date_deadline'] = candidate_end or candidate_start
         response = super(ProjectTask, self).write(vals)
-        if vals.get('employee_ids'):
-            self.assigned_resources.unlink()
-            for rec in self.employee_ids:
-                self.assigned_resources.create({
-                    'task': self.id,
-                    'resource': False,
-                    'resource_base': rec.id,
-                    'units': int(100)
-                })
+        if 'planned_date_begin' in vals or 'planned_date_end' in vals:
+            first = self[:1]
+            _logger.info(
+                "Bryntum task.write persisted first_task_id=%s planned=(%s, %s)",
+                first.id if first else False,
+                first.planned_date_begin if first else False,
+                first.planned_date_end if first else False,
+            )
+        if any(key in vals for key in ("employee_ids", "user_ids", "assigned_ids")):
+            for task in self:
+                if "employee_ids" in vals:
+                    employees = task.employee_ids
+                elif "user_ids" in vals:
+                    employees = self._users_to_employees(task.user_ids)
+                    task.with_context(skip_bryntum_assignment_sync=True).write({"employee_ids": [(6, 0, employees.ids)]})
+                else:
+                    employees = self._users_to_employees(task.assigned_ids)
+                    task.with_context(skip_bryntum_assignment_sync=True).write({"employee_ids": [(6, 0, employees.ids)]})
+                task._sync_gantt_assignments_from_employees()
         return response
-    def create(self, vals):
+
+    @api.model_create_multi
+    def create(self, vals_list):
         """
         override this function to pass resource to the gantt chart
         """
-        response = super(ProjectTask, self).create(vals)
-        if response.employee_ids:
-            self.assigned_resources.unlink()
-            for rec in response.employee_ids:
-                self.assigned_resources.create({
-                    'task': response.id,
-                    'resource': False,
-                    'resource_base': rec.id,
-                    'units': int(100)
-                })
-        return response
+        for vals in vals_list:
+            if (
+                vals.get('planned_date_begin')
+                and vals.get('planned_date_end')
+                and check_gantt_date(vals.get('planned_date_begin')) > check_gantt_date(vals.get('planned_date_end'))
+            ):
+                vals['planned_date_end'] = vals.get('planned_date_begin')
+            if (
+                vals.get('planned_date_begin')
+                and vals.get('date_deadline')
+                and check_gantt_date(vals.get('planned_date_begin')) > check_gantt_date(vals.get('date_deadline'))
+            ):
+                vals['date_deadline'] = vals.get('planned_date_end') or vals.get('planned_date_begin')
+        records = super(ProjectTask, self).create(vals_list)
+        for task in records:
+            if task.employee_ids:
+                task._sync_gantt_assignments_from_employees()
+            elif "user_ids" in task._fields and task.user_ids:
+                employees = self._users_to_employees(task.user_ids)
+                task.with_context(skip_bryntum_assignment_sync=True).write({"employee_ids": [(6, 0, employees.ids)]})
+                task._sync_gantt_assignments_from_employees()
+        return records
 
 
     def copy(self, default=None):

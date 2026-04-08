@@ -32,13 +32,13 @@
             <field name="inherit_id" ref="project.view_task_form2"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='tag_ids']" position="after">
-                    <field name="planned_date_begin" required = "'planned_date_end', '!=', False "/>
-                    <field name="planned_date_end" required = "'planned_date_begin', '!=', False "/>
+                    <field name="planned_date_begin" widget="datetime" required="planned_date_end != False"/>
+                    <field name="planned_date_end" widget="datetime" required="planned_date_begin != False"/>
                     <field name="percent_done"/>
                     <field name="effort"/>
                     <field name="scheduling_mode"/>
                     <field name="constraint_type"/>
-                    <field name="constraint_date" widget="date"/>
+                    <field name="constraint_date"/>
                     <field name="effort_driven"/>
                     <field name="manually_scheduled"/>
                 </xpath>
