@@ -1,0 +1,22 @@
+.gantt_config {
+    height: 250px !important;
+    border-style: solid !important;
+    overflow-y: auto !important;
+}
+
+#bryntum-gantt {
+    height: 100% !important;
+}
+.fa-chart-gantt::before {
+    background: url("../img/chart-gantt-solid.svg") no-repeat;
+    content: "";
+    width: 14px;
+    height: 20px;
+    display: inline-block;
+    background-size: contain;
+    margin-right: 8px;
+    background-position-y: 5px;
+}
+.width_button {
+    width: 25px;
+}
