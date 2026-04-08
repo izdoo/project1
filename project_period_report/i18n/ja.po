@@ -1,0 +1,65 @@
+# Translation of Odoo Server.
+# ja_JP
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#. module: project_period_report
+msgid "Week"
+msgstr "週"
+
+#. module: project_period_report
+msgid "Month"
+msgstr "月"
+
+#. module: project_period_report
+msgid "New Period Report"
+msgstr "新規期間レポート"
+
+#. module: project_period_report
+msgid "Period Reports"
+msgstr "期間レポート"
+
+#. module: project_period_report
+msgid "Weekly / Monthly Project Report"
+msgstr "週次・月次プロジェクトレポート"
+
+#. module: project_period_report
+msgid "1. Basic information"
+msgstr "1. 基本情報"
+
+#. module: project_period_report
+msgid "2. Achievements (this period)"
+msgstr "2. 今期の実績"
+
+#. module: project_period_report
+msgid "3. Next period plan"
+msgstr "3. 次期の予定"
+
+#. module: project_period_report
+msgid "4. Overall progress"
+msgstr "4. 進捗状況"
+
+#. module: project_period_report
+msgid "5. Issues / problems"
+msgstr "5. 課題・問題点"
+
+#. module: project_period_report
+msgid "6. Risks"
+msgstr "6. リスク"
+
+#. module: project_period_report
+msgid "7. Others"
+msgstr "7. その他"
+
+#. module: project_period_report
+msgid "On track"
+msgstr "順調"
+
+#. module: project_period_report
+msgid "Delay"
+msgstr "遅延"
+
+#. module: project_period_report
+msgid "Risk"
+msgstr "リスク"

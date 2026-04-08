@@ -1,0 +1,61 @@
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Project Task Stage -&gt; Done % (Gantt)</h2>
+        <h3 class="oe_slogan">Cấu hình Done % theo giai đoạn để đồng bộ tiến độ chuẩn giữa Odoo và Gantt</h3>
+        <p class="oe_mt16" style="text-align:center;">
+            Module giúp team PM chuẩn hóa quy tắc hoàn thành task: khi task ở trạng thái Hoàn tất,
+            Done % sẽ tự cập nhật theo cấu hình trên từng stage.
+        </p>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Tính năng chính</h2>
+        <div class="oe_span6 oe_mt32">
+            <span class="fa fa-sliders fa-2x pull-left"></span>
+            <p class="oe_mb32" style="margin-left:55px;">
+                Thêm trường cấu hình trên stage: <b>Done % when task is completed (this stage)</b>.
+            </p>
+            <span class="fa fa-check-circle fa-2x pull-left"></span>
+            <p class="oe_mb32" style="margin-left:55px;">
+                Tự set <b>percent_done</b> khi task chuyển sang trạng thái <b>Done</b>.
+            </p>
+            <span class="fa fa-refresh fa-2x pull-left"></span>
+            <p style="margin-left:55px;">
+                Đồng bộ nhất quán dữ liệu tiến độ hiển thị trên backend và Bryntum Gantt.
+            </p>
+        </div>
+        <div class="oe_span6 oe_mt32">
+            <ul>
+                <li>Giá trị hỗ trợ: 0..100</li>
+                <li>Không phá quy trình nhập tay Done % hiện có</li>
+                <li>Triển khai nhanh, dễ training người dùng</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Hướng dẫn sử dụng</h2>
+        <div class="oe_span12">
+            <ol>
+                <li>Vào <b>Project -&gt; Configuration -&gt; Task Stages</b>.</li>
+                <li>Mở stage cần cấu hình và nhập Done % mục tiêu.</li>
+                <li>Vận hành task như bình thường, khi trạng thái Done hệ thống tự cập nhật Done %.</li>
+                <li>Mở Gantt để kiểm tra tiến độ hiển thị đồng bộ.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#875A7B;">Khuyến nghị triển khai</h2>
+        <p class="oe_mt16" style="text-align:center;">
+            Nên chốt chuẩn Done % theo stage với PMO trước khi áp dụng diện rộng
+            (ví dụ Plan=0, Workshop=30, Review=80, Release=100).
+        </p>
+    </div>
+</section>

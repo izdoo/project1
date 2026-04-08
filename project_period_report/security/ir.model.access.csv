@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_project_period_report_user,project.period.report user,model_project_period_report,project.group_project_user,1,1,1,1
+access_project_period_report_manager,project.period.report manager,model_project_period_report,project.group_project_manager,1,1,1,1
+access_project_period_report_achievement_user,project.period.report.achievement user,model_project_period_report_achievement,project.group_project_user,1,1,1,1
+access_project_period_report_achievement_manager,project.period.report.achievement manager,model_project_period_report_achievement,project.group_project_manager,1,1,1,1
+access_project_period_report_plan_line_user,project.period.report.plan.line user,model_project_period_report_plan_line,project.group_project_user,1,1,1,1
+access_project_period_report_plan_line_manager,project.period.report.plan.line manager,model_project_period_report_plan_line,project.group_project_manager,1,1,1,1
+access_project_period_report_progress_user,project.period.report.progress user,model_project_period_report_progress,project.group_project_user,1,1,1,1
+access_project_period_report_progress_manager,project.period.report.progress manager,model_project_period_report_progress,project.group_project_manager,1,1,1,1
+access_project_period_report_issue_user,project.period.report.issue user,model_project_period_report_issue,project.group_project_user,1,1,1,1
+access_project_period_report_issue_manager,project.period.report.issue manager,model_project_period_report_issue,project.group_project_manager,1,1,1,1
+access_project_period_report_risk_user,project.period.report.risk user,model_project_period_report_risk,project.group_project_user,1,1,1,1
+access_project_period_report_risk_manager,project.period.report.risk manager,model_project_period_report_risk,project.group_project_manager,1,1,1,1

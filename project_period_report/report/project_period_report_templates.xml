@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- web.html_container provides report_layout with <main> required by ir_actions_report._prepare_html (PDF). -->
+    <template id="period_report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                <t t-set="company" t-value="doc.company_id"/>
+                <div class="page">
+                    <h2 t-esc="env._('Weekly / Monthly Project Report')"/>
+                    <h3 t-esc="env._('1. Basic information')"/>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <th style="width: 25%;"><span t-esc="env._('Project')"/></th>
+                            <td><span t-field="doc.project_id"/></td>
+                        </tr>
+                        <tr>
+                            <th><span t-esc="env._('Period type')"/></th>
+                            <td>
+                                <span t-if="doc.period_type == 'week'" t-esc="env._('Week')"/>
+                                <span t-if="doc.period_type == 'month'" t-esc="env._('Month')"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><span t-esc="env._('Period')"/></th>
+                            <td>
+                                <span t-esc="env._('From')"/> <span t-field="doc.date_from"/>
+                                <span t-esc="env._('to')"/> <span t-field="doc.date_to"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><span t-esc="env._('Reporter')"/></th>
+                            <td><span t-field="doc.reporter_id"/></td>
+                        </tr>
+                        <tr>
+                            <th><span t-esc="env._('Created on')"/></th>
+                            <td><span t-field="doc.create_date"/></td>
+                        </tr>
+                    </table>
+
+                    <h3 t-esc="env._('2. Weekly results')"/>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                            <tr>
+                                <th style="width: 30%;"><span t-esc="env._('% completion')"/></th>
+                                <td><span t-field="doc.weekly_completion_percent"/></td>
+                                <th style="width: 20%;"><span t-esc="env._('Bug count')"/></th>
+                                <td><span t-field="doc.weekly_bug_count"/></td>
+                            </tr>
+                            <tr>
+                                <th><span t-esc="env._('Task count')"/></th>
+                                <td><span t-field="doc.weekly_task_count"/></td>
+                                <th><span t-esc="env._('Man-day')"/></th>
+                                <td><span t-field="doc.weekly_man_day"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 t-esc="env._('2.1 Completed tasks')"/>
+                    <ul t-if="doc.achievement_completed_ids">
+                        <li t-foreach="doc.achievement_completed_ids" t-as="line">
+                            <span t-field="line.name"/>
+                        </li>
+                    </ul>
+                    <p t-if="not doc.achievement_completed_ids" class="text-muted" t-esc="env._('(No items)')"/>
+
+                    <h4 t-esc="env._('2.2 In-progress tasks')"/>
+                    <ul t-if="doc.achievement_in_progress_ids">
+                        <li t-foreach="doc.achievement_in_progress_ids" t-as="line">
+                            <span t-field="line.name"/>
+                        </li>
+                    </ul>
+                    <p t-if="not doc.achievement_in_progress_ids" class="text-muted" t-esc="env._('(No items)')"/>
+
+                    <h4 t-esc="env._('2.3 Injected tasks')"/>
+                    <ul t-if="doc.achievement_injected_ids">
+                        <li t-foreach="doc.achievement_injected_ids" t-as="line">
+                            <span t-field="line.name"/>
+                        </li>
+                    </ul>
+                    <p t-if="not doc.achievement_injected_ids" class="text-muted" t-esc="env._('(No items)')"/>
+
+                    <h3 t-esc="env._('3. Next period plan')"/>
+                    <ul t-if="doc.plan_next_ids">
+                        <li t-foreach="doc.plan_next_ids" t-as="line">
+                            <span t-field="line.name"/>
+                        </li>
+                    </ul>
+                    <p t-if="not doc.plan_next_ids" class="text-muted" t-esc="env._('(No items)')"/>
+
+                    <h3 t-esc="env._('4. Overall progress')"/>
+                    <table class="table table-sm table-bordered" t-if="doc.progress_ids">
+                        <thead>
+                            <tr>
+                                <th><span t-esc="env._('Area')"/></th>
+                                <th><span t-esc="env._('Plan %')"/></th>
+                                <th><span t-esc="env._('Actual %')"/></th>
+                                <th><span t-esc="env._('Status')"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.progress_ids" t-as="line">
+                                <td><span t-field="line.name"/></td>
+                                <td><span t-field="line.plan_percent"/></td>
+                                <td><span t-field="line.actual_percent"/></td>
+                                <td>
+                                    <span t-if="line.status == 'on_track'" t-esc="env._('On track')"/>
+                                    <span t-if="line.status == 'delay'" t-esc="env._('Delay')"/>
+                                    <span t-if="line.status == 'risk'" t-esc="env._('Risk')"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p t-if="not doc.progress_ids" class="text-muted" t-esc="env._('(No items)')"/>
+
+                    <h3 t-esc="env._('5. Issues / problems')"/>
+                    <table class="table table-sm table-bordered" t-if="doc.issue_ids">
+                        <thead>
+                            <tr>
+                                <th><span t-esc="env._('Problem')"/></th>
+                                <th><span t-esc="env._('Cause')"/></th>
+                                <th><span t-esc="env._('Impact')"/></th>
+                                <th><span t-esc="env._('Action / countermeasure')"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.issue_ids" t-as="line">
+                                <td><span t-field="line.problem"/></td>
+                                <td><span t-field="line.cause"/></td>
+                                <td><span t-field="line.impact"/></td>
+                                <td><span t-field="line.action_note"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p t-if="not doc.issue_ids" class="text-muted" t-esc="env._('(No items)')"/>
+
+                    <h3 t-esc="env._('6. Risks')"/>
+                    <ul t-if="doc.risk_ids">
+                        <li t-foreach="doc.risk_ids" t-as="line">
+                            <span t-field="line.name"/>
+                        </li>
+                    </ul>
+                    <p t-if="not doc.risk_ids" class="text-muted" t-esc="env._('(No items)')"/>
+
+                    <h3 t-esc="env._('7. Others')"/>
+                    <div t-if="doc.other_notes" t-field="doc.other_notes"/>
+                    <p t-if="not doc.other_notes" class="text-muted" t-esc="env._('(Empty)')"/>
+                </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
