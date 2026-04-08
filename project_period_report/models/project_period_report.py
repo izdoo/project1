@@ -243,6 +243,12 @@ class ProjectPeriodReportAchievement(models.Model):
         required=True,
         ondelete="cascade",
     )
+    report_project_id = fields.Many2one(
+        "project.project",
+        related="report_id.project_id",
+        store=False,
+        readonly=True,
+    )
     line_type = fields.Selection(
         [
             ("completed", "Task hoàn thành"),
@@ -253,8 +259,20 @@ class ProjectPeriodReportAchievement(models.Model):
         required=True,
     )
     sequence = fields.Integer(default=10)
-    task_id = fields.Many2one("project.task", ondelete="set null")
+    task_id = fields.Many2one(
+        "project.task",
+        ondelete="set null",
+        domain="[('project_id', '=', report_project_id)]",
+    )
     name = fields.Text(required=True)
+
+    @api.constrains("task_id", "report_id")
+    def _check_task_project_consistency(self):
+        for rec in self:
+            if rec.task_id and rec.report_id and rec.task_id.project_id != rec.report_id.project_id:
+                raise ValidationError(
+                    _("Achievement task must belong to the same project as the report.")
+                )
 
 
 class ProjectPeriodReportPlanLine(models.Model):
@@ -267,8 +285,18 @@ class ProjectPeriodReportPlanLine(models.Model):
         required=True,
         ondelete="cascade",
     )
+    report_project_id = fields.Many2one(
+        "project.project",
+        related="report_id.project_id",
+        store=False,
+        readonly=True,
+    )
     sequence = fields.Integer(default=10)
-    task_id = fields.Many2one("project.task", ondelete="set null")
+    task_id = fields.Many2one(
+        "project.task",
+        ondelete="set null",
+        domain="[('project_id', '=', report_project_id)]",
+    )
     source_type = fields.Selection(
         [
             ("carry_over", "Carry-over from previous week"),
@@ -279,6 +307,14 @@ class ProjectPeriodReportPlanLine(models.Model):
         required=True,
     )
     name = fields.Text(required=True)
+
+    @api.constrains("task_id", "report_id")
+    def _check_task_project_consistency(self):
+        for rec in self:
+            if rec.task_id and rec.report_id and rec.task_id.project_id != rec.report_id.project_id:
+                raise ValidationError(
+                    _("Plan task must belong to the same project as the report.")
+                )
 
 
 class ProjectPeriodReportProgress(models.Model):

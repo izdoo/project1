@@ -9,9 +9,9 @@
         Ngôn ngữ hiển thị và PDF theo ngôn ngữ người dùng.
     """,
     "author": "OdooENV",
-    "license": "LGPL-3",
     "price": 15.0,
     "currency": "USD",
+    "license": "LGPL-3",
     "depends": ["project", "web"],
     "data": [
         "security/ir.model.access.csv",
